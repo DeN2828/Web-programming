@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+
+        let obj = {
+            a: 5,
+            b: 10,
+            c: {
+                x: 'str',
+            },
+        };
+
+        function re(copy) {
+            if (copy == obj.a) { return copy * re(10) }
+            else { return copy }
+        }
+
+    </script>
+</head>
+
+<body>
+
+</body>
+
+</html>
