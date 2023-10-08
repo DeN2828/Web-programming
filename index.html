@@ -15,10 +15,33 @@
             },
         };
 
-        function re(copy) {
-            if (copy == obj.a) { return copy * re(10) }
-            else { return copy }
+        function deepCopy(obj) {
+            if (typeof obj !== 'object' || obj === null) {return obj;}
+
+            if (Array.isArray(obj)) 
+            {
+                const copyArray = [];
+                for (let i = 0; i < obj.length; i++) 
+                {
+                copyArray[i] = deepCopy(obj[i]);
+                }
+                return copyArray;
+            }
+
+            const copyObject = {};
+            for (const key in obj) 
+            {
+                if (Object.hasOwnProperty.call(obj, key)) 
+                {
+                copyObject[key] = deepCopy(obj[key]);
+                }
+            }
+            return copyObject;
         }
+
+
+        const copiedObj = deepCopy(obj);
+        console.log(copiedObj);
 
     </script>
 </head>
