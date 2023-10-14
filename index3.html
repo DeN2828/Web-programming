@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API</title>
+    <!-- <link rel="stylesheet" href="api.css"> -->
+    <style>
+        .body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .row {
+            width: 200px;
+            background: #fe4164;
+            border-radius: 30px;
+        }
+
+        .container1 {
+            display: flex;
+            justify-content: flex-start;
+        }
+        .container{
+            display: flex;
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+
+<body>
+
+    <div class="body">
+        <div class="container">
+            <div class="col" id="source"></div>
+            <div class="col" id="result"></div>
+        </div>
+    </div>
+
+    <template id="user-details-template">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+        <table class="table table-dark table-striped-columns">
+        <tr>
+            <td><slot name="id"></slot></td>
+            <td><slot name="name"></slot></td>
+            <td><slot name="username"></slot></td>
+            <td><slot name="email"></slot></td>
+            <td><slot name="phone"></slot></td>
+            <td><button class="btn btn-primary" data-userid="">Get posts</button></td>
+        </tr>
+        </table>
+
+    </template>
+    <template id="user-post-tamplate">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+        <table class="table table-success table-striped">
+        <tr>
+            <td><slot name="id"></slot></td>
+            <td><slot name="title"></slot></td>
+            <td><slot name="body"></slot></td>
+        </tr>
+        </table>
+
+    </template>
+    <!-- <script src="api.js"></script> -->
+    <script>
+customElements.define(
+  "user-details",
+  class extends HTMLElement {
+    constructor() {
+      super();
+      const template = document.getElementById(
+        "user-details-template"
+      ).content;
+      const shadowRoot = this.attachShadow({ mode: "open" });
+      shadowRoot.appendChild(template.cloneNode(true));
+
+      const button = shadowRoot.querySelector('.btn-primary');
+      button.addEventListener('click', () => {
+          this.loadUserPosts();
+      });
+    }
+
+    loadUserPosts() {
+      let sourceElement = document.querySelector('#result');
+      const userId = this.getAttribute("data-userid");
+
+      sourceElement.innerHTML = "";
+
+      if (userId) {
+
+        fetch(`https://jsonplaceholder.typicode.com/posts?userId=${userId}`)
+          .then((res) => res.json())
+          .then((response) => this.showUserPosts(response, sourceElement));
+      }
+    }
+
+    showUserPosts(users, sourceElement) {
+      users.forEach(item => {
+        let thing = document.createElement('user-post');
+        thing.innerHTML = `
+          <span slot="id">${item.id}</span>
+          <span slot="title">${item.title}</span>
+          <span slot="body">${item.body}</span>
+        `;
+        sourceElement.appendChild(thing);
+      });
+    }
+  }
+);
+
+  customElements.define(
+    "user-post",
+    class extends HTMLElement {
+      constructor() {
+        super();
+        const template = document.getElementById(
+          "user-post-tamplate"
+        ).content;
+        const shadowRoot = this.attachShadow({ mode: "open" });
+        shadowRoot.appendChild(template.cloneNode(true));
+      }
+    },
+  );
+
+  window.addEventListener('load', () => 
+  {
+    fetch('https://jsonplaceholder.typicode.com/users')
+    .then(res => res.json())
+    .then(response => ShowUsers(response))
+
+    function ShowUsers(users)
+    {
+        let sourceElement = document.querySelector('#source');
+        users.forEach(item => {
+            let thing = document.createElement('user-details');
+            thing.setAttribute("data-userid", item.id);
+            console.log(thing.getAttribute("data-userid"));
+            thing.innerHTML = `
+            <span slot="id">${item.id}</span>
+            <span slot="name">${item.name}</span>
+            <span slot="username">${item.username}</span>
+            <span slot="email">${item.email}</span>
+            <span slot="phone">${item.phone}</span>
+            `
+            sourceElement.appendChild(thing);
+        });
+    }
+    
+  });
+
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
